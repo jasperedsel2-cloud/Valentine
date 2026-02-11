@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Valentine's Mylove ❤️</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background:black;overflow:hidden;}
+
+/* ===== FULL SCREEN ===== */
+.screen{
+position:fixed;
+width:100%;
+height:100vh;
+top:0;
+left:0;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* ===== INTRO ===== */
+.intro{background:black;z-index:100;}
+.intro-text{
+font-size:4rem;
+letter-spacing:12px;
+color:#e50914;
+animation:zoom 3s ease forwards;
+}
+@keyframes zoom{
+0%{transform:scale(0.5);opacity:0;}
+50%{transform:scale(1.2);opacity:1;}
+100%{transform:scale(1);}
+}
+
+/* ===== READY ===== */
+.ready{
+background:linear-gradient(135deg,#ff758c,#ff7eb3);
+flex-direction:column;
+text-align:center;
+opacity:0;
+pointer-events:none;
+transition:1s;
+z-index:90;
+}
+.ready.show{opacity:1;pointer-events:auto;}
+.ready h2{color:white;font-size:1.8rem;}
+
+/* ===== BUTTONS ===== */
+button{
+padding:10px 22px;
+border:none;
+border-radius:30px;
+background:white;
+color:#ff4f81;
+font-weight:bold;
+cursor:pointer;
+transition:0.4s ease;
+opacity:0;
+animation:fadeInBtn 0.5s forwards;
+}
+@keyframes fadeInBtn{to{opacity:1;}}
+button:hover{transform:scale(1.1);background:#ff4f81;color:white;}
+
+/* ===== REWIND ===== */
+.rewind{
+background:black;
+color:white;
+font-size:2rem;
+letter-spacing:5px;
+display:none;
+z-index:95;
+}
+
+/* ===== MEMORY ===== */
+.memory-section{
+display:none;
+background:linear-gradient(135deg,#ff758c,#ff7eb3);
+flex-direction:column;
+position:fixed;
+width:100%;
+height:100vh;
+overflow:hidden;
+z-index:10;
+}
+
+/* EFFECT LAYER */
+.effects{
+position:absolute;
+width:100%;
+height:100%;
+top:0;
+left:0;
+pointer-events:none;
+z-index:1;
+}
+
+/* HEARTS */
+.heart{
+position:absolute;
+bottom:-30px;
+color:#ffffff;
+animation:floatUp linear forwards;
+}
+@keyframes floatUp{
+0%{transform:translateY(0);}
+100%{transform:translateY(-110vh);opacity:0;}
+}
+
+/* PETALS */
+.petal{
+position:absolute;
+top:-20px;
+animation:fall linear forwards;
+}
+@keyframes fall{
+0%{transform:translateY(0) rotate(0deg);}
+100%{transform:translateY(110vh) rotate(360deg);}
+}
+
+/* SPARKLES */
+.sparkle{
+position:absolute;
+width:4px;
+height:4px;
+background:white;
+border-radius:50%;
+animation:sparkleAnim 2s infinite;
+}
+@keyframes sparkleAnim{
+0%,100%{opacity:0;}
+50%{opacity:1;}
+}
+
+/* ===== CARD ===== */
+.card-container{perspective:1500px;z-index:10;}
+.card{
+width:320px;
+height:420px;
+position:relative;
+transform-style:preserve-3d;
+transition:transform 0.8s ease;
+}
+.card.fold{transform:rotateY(-180deg);}
+.card-side{
+position:absolute;
+width:100%;
+height:100%;
+backface-visibility:hidden;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 20px 40px rgba(0,0,0,0.3);
+}
+.front{background:white;}
+.front img{width:100%;height:70%;object-fit:cover;}
+.front p{padding:15px;color:#333;font-size:14px;}
+.back{
+background:#fff0f5;
+transform:rotateY(180deg);
+display:flex;
+justify-content:center;
+align-items:center;
+color:#ff4f81;
+font-weight:bold;
+padding:20px;
+}
+
+/* COUNTER */
+.counter{margin-top:10px;color:white;font-weight:bold;}
+
+/* PROGRESS */
+.progress{
+width:250px;
+height:6px;
+background:rgba(255,255,255,0.3);
+border-radius:10px;
+margin-top:10px;
+overflow:hidden;
+}
+.progress-fill{
+height:100%;
+width:0%;
+background:white;
+transition:width 0.5s ease;
+}
+
+.controls{
+margin-top:20px;
+display:flex;
+gap:15px;
+justify-content:center;
+}
+
+/* OUTRO */
+.outro{
+background:black;
+flex-direction:column;
+color:white;
+display:none;
+z-index:200;
+text-align:center;
+}
+.outro-title{
+font-size:3rem;
+letter-spacing:8px;
+opacity:0;
+transition:opacity 2s ease;
+}
+.credits{
+margin-top:40px;
+font-size:1.2rem;
+line-height:2;
+opacity:0;
+transition:opacity 2s ease;
+}
+
+@media(max-width:768px){
+.intro-text{font-size:2.5rem;}
+.card{width:280px;height:380px;}
+}
+</style>
+</head>
+<body>
+
+<audio id="bgMusic" loop>
+<source src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_29e7b3e7e7.mp3?filename=romantic-background-124965.mp3">
+</audio>
+
+<div class="screen intro">
+<div class="intro-text">It's Valentine's!</div>
+</div>
+
+<div class="screen ready" id="readyScreen">
+<h2>Are you ready to see the album? 💕</h2>
+<button onclick="startExperience()">Yes, Let's Go ❤️</button>
+</div>
+
+<div class="screen rewind" id="rewindScreen">
+ Proceeding...
+</div>
+
+<div class="memory-section screen" id="memorySection">
+
+<div class="effects" id="effects"></div>
+
+<div class="card-container">
+<div class="card" id="card">
+<div class="card-side front">
+<img id="memoryImage">
+<p id="memoryText"></p>
+</div>
+<div class="card-side back" id="cardBack">
+Turning to the next memory... 💕
+</div>
+</div>
+</div>
+
+<div class="counter" id="counter"></div>
+<div class="progress">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+<div class="controls" id="controls"></div>
+
+</div>
+
+<div class="screen outro" id="outroScreen">
+<div class="outro-title" id="outroTitle">THE END</div>
+<div class="credits" id="credits">
+<p><strong>Jasper Balansag</strong></p>
+<p>Programmer, Designer</p>
+<br>
+<p>Tools Used:</p>
+<p>HTML • CSS • JavaScript</p>
+<p>TrebEdit</p>
+</div>
+</div>
+
+<script>
+const intro=document.querySelector(".intro");
+const ready=document.getElementById("readyScreen");
+const rewind=document.getElementById("rewindScreen");
+const memory=document.getElementById("memorySection");
+const card=document.getElementById("card");
+const cardBack=document.getElementById("cardBack");
+const img=document.getElementById("memoryImage");
+const text=document.getElementById("memoryText");
+const effects=document.getElementById("effects");
+const controls=document.getElementById("controls");
+const counter=document.getElementById("counter");
+const progressFill=document.getElementById("progressFill");
+const outro=document.getElementById("outroScreen");
+const outroTitle=document.getElementById("outroTitle");
+const credits=document.getElementById("credits");
+
+let isAnimating=false;
+
+const memories=[
+{img:"pic2.jpg",text:"This was where everything quietly began. ❤️"},
+{img:"picture2.jpeg",text:"Your smile still melts me every time. ✨"},
+{img:"pic.jpeg",text:"Through every laugh, you became my favorite chapter. 💕"}
+];
+
+let current=0;
+
+setTimeout(()=>{
+intro.style.display="none";
+ready.classList.add("show");
+},3000);
+
+function startExperience(){
+ready.style.display="none";
+rewind.style.display="flex";
+setTimeout(()=>{
+rewind.style.display="none";
+memory.style.display="flex";
+updateMemory();
+checkButtons();
+startEffects();
+},2000);
+}
+
+function updateMemory(){
+img.src=memories[current].img;
+text.innerHTML=memories[current].text;
+counter.innerHTML=`${current+1} / ${memories.length}`;
+progressFill.style.width=((current+1)/memories.length*100)+"%";
+}
+
+function checkButtons(){
+if(current===0){
+controls.innerHTML=`<button onclick="nextMemory()">Next ➡</button>`;
+}
+else if(current===memories.length-1){
+controls.innerHTML=`
+<button onclick="prevMemory()">⬅ Back</button>
+<button onclick="startOutro()">🎬 End</button>`;
+}
+else{
+controls.innerHTML=`
+<button onclick="prevMemory()">⬅ Previous</button>
+<button onclick="nextMemory()">Next ➡</button>`;
+}
+}
+
+function nextMemory(){
+if(isAnimating||current===memories.length-1) return;
+isAnimating=true;
+cardBack.innerHTML="Turning to the next memory... 💕";
+card.classList.add("fold");
+setTimeout(()=>{
+current++;
+updateMemory();
+card.classList.remove("fold");
+checkButtons();
+isAnimating=false;
+},800);
+}
+
+function prevMemory(){
+if(isAnimating) return;
+isAnimating=true;
+cardBack.innerHTML="Returning to the previous memory... 💖";
+card.classList.add("fold");
+setTimeout(()=>{
+current--;
+updateMemory();
+card.classList.remove("fold");
+checkButtons();
+isAnimating=false;
+},800);
+}
+
+function startOutro(){
+memory.style.opacity="0";
+setTimeout(()=>{
+memory.style.display="none";
+outro.style.display="flex";
+setTimeout(()=>outroTitle.style.opacity="1",500);
+setTimeout(()=>credits.style.opacity="1",2000);
+},1000);
+}
+
+function createHeart(){
+const h=document.createElement("div");
+h.className="heart";
+h.innerHTML="❤";
+h.style.left=Math.random()*100+"vw";
+h.style.fontSize=(Math.random()*20+15)+"px";
+h.style.animationDuration=(Math.random()*4+4)+"s";
+effects.appendChild(h);
+setTimeout(()=>h.remove(),8000);
+}
+function createPetal(){
+const p=document.createElement("div");
+p.className="petal";
+p.innerHTML="🌸";
+p.style.left=Math.random()*100+"vw";
+p.style.animationDuration=(Math.random()*6+6)+"s";
+effects.appendChild(p);
+setTimeout(()=>p.remove(),12000);
+}
+function createSparkle(){
+const s=document.createElement("div");
+s.className="sparkle";
+s.style.top=Math.random()*100+"vh";
+s.style.left=Math.random()*100+"vw";
+effects.appendChild(s);
+setTimeout(()=>s.remove(),2000);
+}
+function startEffects(){
+setInterval(createHeart,600);
+setInterval(createPetal,1200);
+setInterval(createSparkle,300);
+}
+</script>
+
+</body>
+</html>
